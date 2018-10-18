@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style type="text/css">
+    canvas{
+      border:1px solid black;
+    }
+  </style>
+</head>
+<body>
+<canvas width="600" height="600"></canvas>
+<script type="text/javascript">
+  var canvas = document.getElementsByTagName("canvas")[0];
+  var ctx = canvas.getContext("2d");
+
+  var image = new Image();
+  image.src = "R/images/bird0_0.png";
+
+  //小鸟的位置
+  var x = 200;
+  var y = 100;
+  var f = 0;				//总帧编号
+  var birdf = 0;  		//小帧号，从下落的那一时刻开始计数
+  var d = 0;				//度数
+  var hasEnergy = false;	//是否拥有能量
+
+
+  image.onload = function(){
+    setInterval(function(){
+      //清屏
+      ctx.clearRect(0, 0, 600, 600);
+      f++;
+      //显示帧编号
+      ctx.font = "20px consolas";
+      ctx.fillText(f, 20,20);
+
+      //根据是否有能量来进行不同的y的改变
+      if(hasEnergy){
+        //上升20帧
+        y -= 0.78 * (10 - birdf);
+        //掉落20帧之后，要让小鸟没有能量
+        if(birdf > 10){
+          hasEnergy = false;
+          birdf = 0;
+        }
+
+        //验收
+        if(y < 0){
+          y = 0;
+        }
+      }else{
+        //下落
+        y += 0.6 * birdf;
+      }
+      d += 0.04;
+      birdf++;
+
+      //保存ctx
+      ctx.save();
+      //移动
+      ctx.translate(x + 24 , y + 24); //将坐标系拉动到小鸟中点
+      ctx.rotate(d);
+      ctx.fillText(birdf,-24,-24);	//打印小帧数
+      ctx.fillText(hasEnergy,-14,-14);	//打印小帧数
+      ctx.drawImage(image,-24,-24);	//显示小鸟图片
+      //恢复ctx
+      ctx.restore();
+    },50);
+  }
+
+  canvas.onclick = function(){
+    hasEnergy = true;
+    birdf = 0;
+    d = -0.9;
+  }
+</script>
+</body>
+</html>
